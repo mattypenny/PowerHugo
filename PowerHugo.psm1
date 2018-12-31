@@ -176,8 +176,6 @@ function Get-BodyTextWithMarkupRemovedForASpecificCharacter {
 
     for ($i=0; $i -le $Length; $i++) {
 
-        # write-debug "$BodyText[$i]"
-
         if ($BodyText[$i] -eq $StartMarkupString) {
             $BracketLevel = $BracketLevel + 1
         }
