@@ -1,4 +1,10 @@
-﻿ <#
+﻿$DefaultImageUrlRoot = 'http://salisburyandstonehenge.net'
+$DefaultDefaultImage = "http://salisburyandstonehenge.net/images/View%20of%20the%20spire%20from%20Salisbury%20Cathedral's%20cafe.JPG"
+$DefaultImagePath = '/home/matt/salisburyandstonehenge.net/static/images'
+$DefaultTwitterCard = "summary_large_image"
+$DefaultTwitterSite = "@salisbury_matt"
+$DefaultTwitterCreator = "@salisbury_matt"
+<#
 Needs to look like this:
 twitter:
   card: "summary_large_image"
@@ -11,77 +17,187 @@ twitter:
          
 
 #>
+
+function Get-TwitterCardText {
+    [CmdletBinding()]
+    param (
+        $HugoMarkdownFile,
+        [string]$Card = "summary_large_image",
+        [string]$Site = $DefaultTwitterSite,
+        [string]$Creator = $DefaultTwitterCreator,
+        [string]$DescriptionMaxLength = 240,
+        [string]$ImageUrlRoot = $DefaultImageUrlRoot,
+        [string]$DefaultImage = $DefaultDefaultImage,
+        [string]$UrlRoot = $DefaultUrlRoot,
+        [string]$ImagePath = $DefaultImagePath
+    )
+    
+    write-startfunction
+
+    
+    if (test-path $HugoMarkdownFile) 
+    {
+        write-debug "Found files matching $HugoMarkdownFile"
+    }
+    else
+    {
+        $SplatParams = @{
+            ExceptionName = "No such markdown files"
+            ExceptionMessage = "No markdown files match $MultipleHugoMarkdownFiles"
+            errorId = "ERR-042"            
+            ErrorCategory = InvalidArgument
+        }    
+        write-debug "$SplatParams.ExceptionName"
+        ThrowError @SplatParams
+    }
+
+    $SplatParams = @{
+        HugoMarkdownFile = $HugoMarkdownFile
+        Card = $Card
+        Site = $Site
+        Creator = $Creator
+        DescriptionMaxLength = $DescriptionMaxLength
+        ImageUrlRoot = $ImageUrlRoot
+        DefaultImage = $DefaultImage
+        UrlRoot = $UrlRoot
+        ImagePath = $ImagePath
+    }
+    
+    
+    $TwitterCardMetaData = Get-TwitterCardMetaData @SplatParams
+
+    
+
+
+    $TwitterCardText = ""
+    foreach ($T in $TwitterCardMetaData) {
+        [string]$Title = $T.Title
+        [string]$ImageUrl = $T.ImageUrl
+        [string]$Description = $T.Description
+        [string]$Url = $T.Url
+        [string]$Card = $T.Card
+        [string]$Site = $T.Site
+        [string]$Creator = $T.Creator
+
+        $TwitterCardText += @"
+$TwitterCardText
+twitter:
+    card: $Card
+    site: $Site
+    creator: $Creator
+    title: $Title
+    description: $Description
+    image: $ImageURL
+    url: $URL
+              
+"@
+
+    }
+
+    write-endfunction
+}
+
 function Get-TwitterCardMetaData {
     [CmdletBinding()]
     param (
-        [string]$HugoMarkdownFile,
+        $HugoMarkdownFile,
         [string]$Card = "summary_large_image",
         [string]$Site = $DefaultSite,
         [string]$Creator = $DefaultCreator,
         [string]$DescriptionMaxLength = 240,
         [string]$ImageUrlRoot = $DefaultImageUrlRoot,
-        [string]$DefaultImage,
-        [string]$UrlRoot = $DefaultUrlRoot
+        [string]$DefaultImage = $DefaultDefaultImage,
+        [string]$UrlRoot = $DefaultUrlRoot,
+        [string]$ImagePath = $DefaultImagePath
     )
     
     write-startfunction
 
-    if (!(test-path $HugoMarkdownFile)) {
-        throw "HugoMarkdownFile $HugoMarkDownFile does not exist"
+    $MultipleHugoMarkdownFiles = $HugoMarkdownFile
+    $TwitterMetaCardData = @()
+    
+    if (test-path $MultipleHugoMarkdownFiles) 
+    {
+        $ChildItems = Get-ChildItem $MultipleHugoMarkdownFiles -ErrorAction Continue
+    }
+    else
+    {
+        $SplatParams = @{
+            ExceptionName = "No such markdown files"
+            ExceptionMessage = "No markdown files match $MultipleHugoMarkdownFiles"
+            errorId = "ERR-041"            
+            ErrorCategory = InvalidArgument
+        }    
+        write-debug "$SplatParams.ExceptionName"
+        ThrowError @SplatParams
     }
 
-
-    $HugoContent = get-HugoContent -HugoMarkdownFile $HugoMarkdownFile
-
-    [string]$Title = $HugoContent.Title
-    Write-Debug "`$Title <$Title>"
-
-    if ($HugoContent.URL)
+    foreach ($H in $ChildItems)
     {
-        [string]$URL = $UrlRoot + $HugoContent.URL
-    }
-    else 
-    {
-        $FileDetails = Get-ChildItem $HugoMarkdownFile 
-        
-        [string]$URL = $FileDetails.Name
-        $URL = $Url.TrimEnd('.md')
-        $Url = $UrlRoot + '/' + $Url
+    
+        [string]$HugoMarkdownFile = $H.fullname
 
-    }
+        write-debug "Picking out data for: `$HugoMarkdownFile <$HugoMarkdownFile>"
+        if (!(test-path $HugoMarkdownFile)) {
+            throw "HugoMarkdownFile $HugoMarkDownFile does not exist"
+        }
 
-    Write-Debug "`$URL <$URL>"
 
-    [string]$BodyText = $HugoContent.Body
-    # get first image
-    $Image = get-ImageDetails -PostPath $HugoMarkdownFile | Select-Object -first 1
+        $HugoContent = get-HugoContent -HugoMarkdownFile $HugoMarkdownFile
 
-    if ($Image)
-    {
-        [string]$ImageUrl = $ImageUrlRoot + $Image.Image
-        Write-Debug "In if `$ImageUrl: <$ImageUrl>"
-        if (!$Image.ImageExists)
+        [string]$Title = $HugoContent.Title
+        Write-Debug "`$Title <$Title>"
+
+        if ($HugoContent.URL)
         {
-            Write-Warning "Image $ImageUrl does not exist"
+            [string]$URL = $UrlRoot + $HugoContent.URL
+        }
+        else 
+        {
+            $FileDetails = Get-ChildItem $HugoMarkdownFile 
+            
+            [string]$URL = $FileDetails.Name
+            $URL = $Url.TrimEnd('.md')
+            $Url = $UrlRoot + '/' + $Url
+
+        }
+
+        Write-Debug "`$URL <$URL>"
+
+        [string]$BodyText = $HugoContent.Body
+        # get first image
+        $Image = get-ImageDetails -PostPath $HugoMarkdownFile -ImagePath $ImagePath  | Select-Object -first 1
+
+        if ($Image)
+        {
+            [string]$ImageUrl = $ImageUrlRoot + $Image.Image
+            Write-Debug "In if `$ImageUrl: <$ImageUrl>"
+            if (!$Image.ImageExists)
+            {
+                Write-Warning "Image $ImageUrl does not exist"
+            }
+        }
+        else 
+        {
+            $ImageUrl = $DefaultImage
+            Write-Debug "In else `$ImageUrl: <$ImageUrl>"
+                
+        }
+
+
+
+        $Description = Get-DescriptionFromBodyText -BodyText  $BodyText -MaximumLength 240 
+
+        $TwitterMetaCardData += [PSCustomObject]@{
+            Title = $Title
+            ImageUrl = $ImageUrl
+            Description = $Description 
+            Url = $Url
         }
     }
-    else 
-    {
-        $ImageUrl = $DefaultImage
-        Write-Debug "In else `$ImageUrl: <$ImageUrl>"
-            
-    }
 
-
-
-    $Description = Get-DescriptionFromBodyText -BodyText  $BodyText -MaximumLength 240 
-
-    [PSCustomObject]@{
-        Title = $Title
-        ImageUrl = $ImageUrl
-        Description = $Description 
-        Url = $Url
-    }
+    $TwitterMetaCardData
+    
 }
 
 
@@ -399,6 +515,14 @@ date       title                                                                
         $markup = ""
         $url = ""
         $body = ""
+        $card = ""
+        $site = ""
+        $creator = ""
+        $title = ""
+        $description = ""
+        $image = ""
+        $TwitterCardURL = ""
+
            
         <#
             Initialize the potentially multi-value and/or multi-line properties
@@ -406,6 +530,9 @@ date       title                                                                
         $TagString = ""
         $CategoriesString = ""
         $AliasesString = ""
+        [int]$TitleCount = 0
+        
+        [Boolean]$TwitterCardFound = $False
                
         foreach ($MarkdownLine in $MarkDownLines)
         {
@@ -439,67 +566,119 @@ date       title                                                                
                         "title" 
                         { 
                             write-debug "in switch"; 
-                            $title = $PropertyValue 
+                            $title = $PropertyValue
+                            $TitleCount = $TitleCount + 1
+                            
+                            if ($TitleCount -gt 1)
+                            {
+                                if ($TwitterCardFound -eq $True)
+                                {
+                                    
+                                    $TwitterCardTitle = $PropertyValue
+                                }
+                            }
                         }
                         "description"
                         { 
-                            write-debug "description - in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $description = $PropertyValue 
                         }
                         "lastmod"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $lastmod = $PropertyValue 
                         }
                         "date"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $date = $PropertyValue 
                         }
                         "tags" 
                         {
                             
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $TagString = $PropertyValue
                             
                         }
                         # aliases CAN be multiple, but I've not coded for this yet
                         "aliases"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $aliasesString = $PropertyValue 
                         }
                         "categories"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $categoriesString = $PropertyValue 
                         }
                     
                         "draft"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $draft = $PropertyValue 
                         }
                         "publishdate"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $publishdate = $PropertyValue 
                         }
                         "weight"
                         { 
-                            write-debug "in switch"; 
+                            write-debug "$PropertyValue - in switch"; 
                             $weight = $PropertyValue 
                         }
                         "markup"
                         { 
-                            write-debug "in switch - markup"; 
+                            write-debug "$PropertyValue - in switch - markup"; 
                             $markup = $PropertyValue 
                         }
                         "url"
                         { 
-                            write-debug "in switch"; 
-                            $url = $PropertyValue 
+                            write-debug "$PropertyValue - in switch"; 
+                            if ($TwitterCardFound)
+                            {
+                                $TwitterCardURL = $Url
+                            }
+                            else 
+                            {
+                                $url = $PropertyValue
+                            } 
                         }  
+                        "twitter"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $TwitterCardFound = $True
+                        }
+                        "card"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $Card = $PropertyValue 
+                        }
+                        "site"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $site = $PropertyValue 
+                        }
+                        "creator"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $creator = $PropertyValue 
+                        }
+                        "description"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $description = $PropertyValue 
+                        }
+                        "image"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $image = $PropertyValue 
+                        }
+                        "url"
+                        { 
+                            write-debug "$PropertyValue - in switch"; 
+                            $url = $PropertyValue 
+                        }
                         <#
                             if the Property name is null, either it's an invalid line
                             or it's multiline
@@ -540,7 +719,7 @@ date       title                                                                
                     
                         Default
                         { 
-                                    write-error "ERR020: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue>"
+                                    write-error "ERR020: There is an invalid line: Line: <$Line> PropertyName: <$PropertyName> PropertyValue <$PropertyValue> File <$File>"
                         }
                                 
     
@@ -589,6 +768,13 @@ $Body$Line$CarriageReturn
             url = $url
             unknownproperty = $unknownproperty
             body = $body
+            card = $card
+            site = $site
+            creator = $creator
+            TwitterTitle = $TwitterCardTitle
+            image = $image
+            url = $Url
+            TwitterDescription = $description
         }
 "@
 
@@ -968,6 +1154,7 @@ function get-PostsWithImages
     {
         $Images = @()
         
+        write-debug "Processing post `$P: <$P>"
         $MarkdownStyleImageLines = select-string "\!\[" $P
 
         $HtmlStyleImageLines = select-string "<img" $P
@@ -1039,7 +1226,7 @@ function get-imagesFromMarkdownStyleImageLines
     $Line = $Line.replace("`)", "`(")
     write-debug "Line (bracket swapped): $Line"
     
-    $SplitLine = $Line.Split("\(")
+    $SplitLine = $Line.Split("(")
     write-debug "SplitLine: $SplitLine"
     
     $NumberofElements = $SplitLine.Length
@@ -1217,8 +1404,8 @@ function get-ImageDetails
         $name = $i.Name
         $fullname = $i.Fullname
         
-        write-host "Testing <test-path "$ImagePath\$image>
-        $ImageExists = test-path "$ImagePath\$image"
+        write-host "Testing $(join-path $ImagePath $image)>"
+        $ImageExists = test-path $(join-path $ImagePath $image)
         
         write-debug @"
         [PSCustomObject]@{ Image=$Image  

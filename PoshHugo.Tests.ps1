@@ -139,6 +139,111 @@ Describe "get-HugoContent for a single file" {
     #>
 }
 
+Describe -Tag Twitterx "get-HugoContent for a single file which already has Twitter card data" {
+    
+    $HugoContent = get-HugoContent -f $TestData\9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born.md
+
+    It "returns title" {
+        $title = $HugoContent.title
+        $title | Should Be '9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born'
+    }
+
+    It "returns description" {
+        $description = $HugoContent.description
+        $description | Should Be ''
+    }
+
+
+    It "returns lastmod" {
+        $lastmod = $HugoContent.lastmod
+        $lastmod | Should Be '2016-10-04'
+    }
+
+    It "returns date" {
+        $date = $HugoContent.date
+        $date | Should Be '2013-11-12'
+    }
+
+    It "returns tags" {
+        $tags = $HugoContent.tags
+        $tags[0] | Should be ""
+
+        
+    }
+
+    It "returns categories" {
+        $categories = $HugoContent.categories
+        $ExpectedCategories = @("on-this-day", "dummy")
+        $Comparison = Compare-Object $categories $ExpectedCategories
+        $Comparison.InputObject | Should Be "dummy"
+        $Comparison.SideIndicator | Should Be "=>"
+    }
+
+    It "returns aliases" {
+        $Content = $HugoContent.aliases
+        $ExpectedContent = @("/on-this-day/january/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born", "/about-Pepys-and-Salisbury", "dummy")
+        $Comparison = Compare-Object $Content $ExpectedContent
+        $Comparison.InputObject | Should Be "dummy"
+        $Comparison.SideIndicator | Should Be "=>" 
+    }
+
+    It "returns draft" {
+        $draft = $HugoContent.draft
+        $draft | Should Be 'No'
+    }
+
+    It "returns publishdate" {
+        $publishdate = $HugoContent.publishdate
+        $publishdate | Should Be '2013-11-12'
+    }
+
+    It "returns weighting" {
+        $Weight = $HugoContent.Weight
+        $Weight | Should Be '109'
+    }
+
+    It "returns markup" {
+        $markup = $HugoContent.markup
+        $markup | Should Be 'Md'
+    }
+
+    It "returns url" {
+        $url = $HugoContent.url
+        $url | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
+    }
+
+    It "returns twitter card card" {
+
+    }
+
+    It "returns twitter card site" {
+        
+    }
+
+    It "returns twitter card creator" {
+        
+    }
+
+    It "returns twitter card title" {
+        
+    }
+
+    It "returns twitter card description" {
+        
+    }
+
+    It "returns twitter card image" {
+        
+    }
+    It "returns twitter card url" {
+        
+    }
+
+
+
+
+}
+
 Describe "get-HugoContent for multiple file" {
     
     $HugoContent = get-HugoContent -f $TestData\10th-june-1668-samuel-pepys-visits-salisbury.md
@@ -389,10 +494,12 @@ url: /on-this-day/june/3rd-june-1977-the-ramones-visit-stonehenge-johnny-stays-o
 
 <a href="/images/Joey-Ramone-visited-Stonehenge.jpg"><img src="/images/Joey-Ramone-visited-Stonehenge.jpg" alt="Joey Ramone - &#039;visited&#039; Stonehenge" width="320" height="455" class="alignright size-full wp-image-9702" /></a>On either the 3rd<a name="Source1" href="#Note1">[1]</a> or possibly the 4th June 1977, the Ramones visited Stonehenge.
 
-<a href="/images/The_Battle_of_Sebastopol.png"><img src="/images/The_Battle_of_Sebastopol.png"
-alt="The_Battle_of_Sebastopol"  class="alignright size-medium wp-image-9391" /></a>On January 25th 1858 the Mayor and
-Corporation received a Russian cannon captured at Sebastopol<a name="Source1" href="#Note1">[1]</a>. It was installed outside
-the Guildhall.
+Mickey Leigh, who was travelling with the band quotes Chris Frantz of the Talking Heads:
+<blockquote>"The Talking Heads like to enjoy things and the Ramones loved to hate everything," Chris Frantz mused. "Or it _seemed_ like they loved to hate everything. Like when we went to Stonehenge and Johnny stayed in the van. He'd snarl, "I DON'T WANT TO STOP HERE. IT's JUST A BUNCH OF OLD ROCKS!"<a href="#FootNote2" name="Body2">[2]</a></blockquote>
+
+
+David P. Szatmary quotes Dee Dee Ramone:
+<blockquote> On a Talking Heads-planed side trip to Stonehenge during the tour, the Ramones refused to leave the bus. "It's really nothing to see", explained Dee Dee, "It's not like going to see a castle"<a href="#FootNote3" name="Body3">[3]</a></blockquote>
 
 > Pic: By en:User:Dawkeye [<a href="http://www.gnu.org/copyleft/fdl.html">GFDL</a>, <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA-3.0</a> or <a href="http://creativecommons.org/licenses/by-sa/2.5">CC-BY-SA-2.5</a>], <a href="http://commons.wikimedia.org/wiki/File%3AJoeyramone.jpg">via Wikimedia Commons</a>
 
@@ -436,7 +543,7 @@ the Guildhall.
     }
 
     It "returns the correct value for description" {
-
+        $Description | Should Be "On either the 3rd or possibly the 4th June 1977, the Ramones visited Stonehenge."
     }
 
     It "returns the correct value for the image" {
@@ -461,6 +568,49 @@ the Guildhall.
     It "returns the correct value for URL" {
 
         $URL | Should Be "http://salisburyandstonehenge.net/on-this-day/june/3rd-june-1977-the-ramones-visit-stonehenge-johnny-stays-on-the-bus"
+    }
+
+}
+
+Describe "get-imagesFromMarkdownStyleImageLines" {
+
+
+    It "extracts the image from a line with nothing else on it" {
+
+        $Image = get-imagesFromMarkdownStyleImageLines "![Dickens dream](/images/Dickens_dream.jpg)" 
+
+        $Image | Should Be "/images/Dickens_dream.jpg"
+    }
+    It "extracts the image from a line other stuff on it" {
+
+        $Image = get-imagesFromMarkdownStyleImageLines "![Dickens dream](/images/Dickens_dream.jpg)A very nice picture of Chuck D" 
+
+        $Image | Should Be "/images/Dickens_dream.jpg"
+    }
+}
+
+Describe -Tag Twitterx "Get-TwitterCardText" {
+    $SplatParams = @{
+        Card = "summary_large_image"
+        Site = "@salisbury_matt"
+        Creator = "@salisbury_matt"
+        DescriptionMaxLength = 240
+        ImageUrlRoot = 'http://salisburyandstonehenge.net'
+        DefaultImage = "http://salisburyandstonehenge.net/images/View%20of%20the%20spire%20from%20Salisbury%20Cathedral's%20cafe.JPG"
+        UrlRoot = 'http://salisburyandstonehenge.net'
+        ImagePath = '/home/matt/salisburyandstonehenge.net/static/images'
+    }
+
+    $HugoMarkdownFile = "./pesterdata/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born.md"
+    [string]$ExpectedTwitterCardText = "???"
+    
+    It "returns the correct text for a single file ($HugoMarkdownFile)" {
+
+
+        $TwitterCardText = Get-TwitterCardText @SplatParams -HugoMarkdownFile $HugoMarkdownFile
+
+        $TwitterCardText | Should Be $ExpectedTwitterCardText
+
     }
 
 }
