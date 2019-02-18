@@ -18,7 +18,7 @@ twitter:
 
 #>
 
-function Get-TwitterCardText {
+function Get-ExtractedTwitterCardText {
     [CmdletBinding()]
     param (
         $HugoMarkdownFile,
@@ -37,7 +37,7 @@ function Get-TwitterCardText {
     
     if (test-path $HugoMarkdownFile) 
     {
-        write-debug "Found files matching $HugoMarkdownFile"
+        write-dbg "Found files matching $HugoMarkdownFile"
     }
     else
     {
@@ -47,7 +47,7 @@ function Get-TwitterCardText {
             errorId = "ERR-042"            
             ErrorCategory = InvalidArgument
         }    
-        write-debug "$SplatParams.ExceptionName"
+        write-dbg "$SplatParams.ExceptionName"
         ThrowError @SplatParams
     }
 
@@ -65,22 +65,21 @@ function Get-TwitterCardText {
     
     
     $TwitterCardMetaData = Get-TwitterCardMetaData @SplatParams
-
+    $TwitterCardMetaDataCount = $($TwitterCardMetaData | Measure-Object).count
+    write-dbg "`$TwitterCardMetaDataCount: <$TwitterCardMetaDataCount>"
     
 
 
-    $TwitterCardText = ""
+    $ExtractedTwitterCardText = ""
     foreach ($T in $TwitterCardMetaData) {
         [string]$Title = $T.Title
         [string]$ImageUrl = $T.ImageUrl
         [string]$Description = $T.Description
         [string]$Url = $T.Url
-        [string]$Card = $T.Card
-        [string]$Site = $T.Site
-        [string]$Creator = $T.Creator
-
-        $TwitterCardText += @"
-$TwitterCardText
+        
+        write-dbg "Processing `$TwitterCardMetaData for `$Title: <$Title>"
+        $ExtractedTwitterCardText += @"
+$ExtractedTwitterCardText
 twitter:
     card: $Card
     site: $Site
@@ -89,12 +88,14 @@ twitter:
     description: $Description
     image: $ImageURL
     url: $URL
-              
 "@
 
     }
 
     write-endfunction
+
+    write-dbg "`$ExtractedTwitterCardText: <$ExtractedTwitterCardText>"
+    $ExtractedTwitterCardText
 }
 
 function Get-TwitterCardMetaData {
@@ -128,7 +129,7 @@ function Get-TwitterCardMetaData {
             errorId = "ERR-041"            
             ErrorCategory = InvalidArgument
         }    
-        write-debug "$SplatParams.ExceptionName"
+        write-dbg "$SplatParams.ExceptionName"
         ThrowError @SplatParams
     }
 
@@ -137,7 +138,7 @@ function Get-TwitterCardMetaData {
     
         [string]$HugoMarkdownFile = $H.fullname
 
-        write-debug "Picking out data for: `$HugoMarkdownFile <$HugoMarkdownFile>"
+        write-dbg "Picking out data for: `$HugoMarkdownFile <$HugoMarkdownFile>"
         if (!(test-path $HugoMarkdownFile)) {
             throw "HugoMarkdownFile $HugoMarkDownFile does not exist"
         }
@@ -146,11 +147,12 @@ function Get-TwitterCardMetaData {
         $HugoContent = get-HugoContent -HugoMarkdownFile $HugoMarkdownFile
 
         [string]$Title = $HugoContent.Title
-        Write-Debug "`$Title <$Title>"
+        write-dbg "`$Title <$Title>"
 
         if ($HugoContent.URL)
         {
             [string]$URL = $UrlRoot + $HugoContent.URL
+            write-dbg "In if `$URL: <$URL>"
         }
         else 
         {
@@ -159,10 +161,11 @@ function Get-TwitterCardMetaData {
             [string]$URL = $FileDetails.Name
             $URL = $Url.TrimEnd('.md')
             $Url = $UrlRoot + '/' + $Url
+            write-dbg "In else `$URL: <$URL>"
 
         }
 
-        Write-Debug "`$URL <$URL>"
+        write-dbg "`$URL <$URL>"
 
         [string]$BodyText = $HugoContent.Body
         # get first image
@@ -171,7 +174,7 @@ function Get-TwitterCardMetaData {
         if ($Image)
         {
             [string]$ImageUrl = $ImageUrlRoot + $Image.Image
-            Write-Debug "In if `$ImageUrl: <$ImageUrl>"
+            write-dbg "In if `$ImageUrl: <$ImageUrl>"
             if (!$Image.ImageExists)
             {
                 Write-Warning "Image $ImageUrl does not exist"
@@ -180,7 +183,7 @@ function Get-TwitterCardMetaData {
         else 
         {
             $ImageUrl = $DefaultImage
-            Write-Debug "In else `$ImageUrl: <$ImageUrl>"
+            write-dbg "In else `$ImageUrl: <$ImageUrl>"
                 
         }
 
@@ -211,24 +214,24 @@ function Get-DescriptionFromBodyText {
 
     write-startfunction
     
-    write-debug "Remove markup `$BodyText: <$BodyText>"
+    write-dbg "Remove markup `$BodyText: <$BodyText>"
     [string]$ReturnString = Get-BodyTextWithMarkupRemoved -BodyText $BodyText
 
     
-    write-debug "Chop string `$ReturnString: <$ReturnString>"
+    write-dbg "Chop string `$ReturnString: <$ReturnString>"
     if ($ReturnString.Length -ge $MaximumLength) {
         [string]$ReturnString = $ReturnString.substring(0,$MaximumLength)
     }
 
-    write-debug "Locate full stop before the 240th charactor or use last charactor `$ReturnString: <$ReturnString>"
+    write-dbg "Locate full stop before the 240th charactor or use last charactor `$ReturnString: <$ReturnString>"
 
     [int]$LastFullStop = $ReturnString.lastindexof('.') + 1
-    Write-Debug "`$LastFullStop: <$LastFullStop>"
+    write-dbg "`$LastFullStop: <$LastFullStop>"
     if ($LastFullStop -gt 0) {
         $ReturnString = $ReturnString.substring(0, $LastFullStop)
     }
     
-    write-debug "Returning `$ReturnString: <$ReturnString>"
+    write-dbg "Returning `$ReturnString: <$ReturnString>"
     
     write-endfunction
     # $DebugPreference = "SilentlyContinue"
@@ -242,13 +245,13 @@ function Get-BodyTextWithMarkupRemoved {
     )
     write-startfunction
     
-    write-debug "Remove stuff in <>"
+    write-dbg "Remove stuff in <>"
     $BodyText = Get-BodyTextWithMarkupRemovedForASpecificCharacter -BodyText $BodyText -StartMarkupString "<" -EndMarkupString ">"
 
-    write-debug "Remove stuff in []"
+    write-dbg "Remove stuff in []"
     $BodyText = Get-BodyTextWithMarkupRemovedForASpecificCharacter -BodyText $BodyText -StartMarkupString "[" -EndMarkupString "]"
 
-    write-debug "Remove stuff in ()"
+    write-dbg "Remove stuff in ()"
     $BodyText = Get-BodyTextWithMarkupRemovedForASpecificCharacter -BodyText $BodyText -StartMarkupString "(" -EndMarkupString ")"
 
     $BodyText = $BodyText.replace('!','')
@@ -269,7 +272,7 @@ function Get-BodyTextWithMarkupRemoved {
     $BodyText = $BodyText.trimstart()    
     
 
-    write-debug "Returning `$BodyText: $BodyText"
+    write-dbg "Returning `$BodyText: $BodyText"
     write-endfunction
 
     return $BodyText
@@ -358,12 +361,12 @@ function Get-ChildItemByWeight
     $MatchingFiles = foreach ($F in $(dir $Path))
     {
         $Filename = $F.name
-	write-debug "`$Filename: <$Filename>"
+	write-dbg "`$Filename: <$Filename>"
         $WeightMatch = select-string "Weight: " $Filename
 
         [string]$WeightLine = $WeightMatch.Line
 
-	write-debug "`$WeightLine: <$WeightLine>"
+	write-dbg "`$WeightLine: <$WeightLine>"
         [int]$Weight = $WeightLine.split(':')[1]
 
 
@@ -496,7 +499,7 @@ date       title                                                                
         $MarkdownLines = select-string -pattern '^' $File -encoding ascii
 
         $NumberOfMarkDownLines = $MarkdownLines | measure-object -Line
-        write-debug "`$NumberOfMarkDownLines: $NumberOfMarkDownLines"
+        write-dbg "`$NumberOfMarkDownLines: $NumberOfMarkDownLines"
 
     
         $PropertyCount = 0
@@ -554,9 +557,10 @@ date       title                                                                
                     [string]$PropertyValue = $HugoNameAndValue.PropertyValue
  
                     $PropertyName = $PropertyName.Trim()
+                    $PropertyValue = $PropertyValue.Trim()
 
-                    write-debug "`$PropertyName: <$PropertyName>"
-                    write-debug "`$PropertyValue: <$PropertyValue>"
+                    write-dbg "`$PropertyName: <$PropertyName>"
+                    write-dbg "`$PropertyValue: <$PropertyValue>"
     
                     $PropertyCount = $PropertyCount + 1
                 
@@ -565,7 +569,7 @@ date       title                                                                
                     {
                         "title" 
                         { 
-                            write-debug "in switch"; 
+                            write-dbg "in switch"; 
                             $title = $PropertyValue
                             $TitleCount = $TitleCount + 1
                             
@@ -580,64 +584,65 @@ date       title                                                                
                         }
                         "description"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $description = $PropertyValue 
                         }
                         "lastmod"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $lastmod = $PropertyValue 
                         }
                         "date"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $date = $PropertyValue 
                         }
                         "tags" 
                         {
                             
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $TagString = $PropertyValue
                             
                         }
                         # aliases CAN be multiple, but I've not coded for this yet
                         "aliases"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $aliasesString = $PropertyValue 
                         }
                         "categories"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $categoriesString = $PropertyValue 
                         }
                     
                         "draft"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $draft = $PropertyValue 
                         }
                         "publishdate"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $publishdate = $PropertyValue 
                         }
                         "weight"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $weight = $PropertyValue 
                         }
                         "markup"
                         { 
-                            write-debug "$PropertyValue - in switch - markup"; 
+                            write-dbg "$PropertyValue - in switch - markup"; 
                             $markup = $PropertyValue 
                         }
                         "url"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             if ($TwitterCardFound)
                             {
-                                $TwitterCardURL = $Url
+                                $TwitterCardURL = $PropertyValue
+                                write-dbg "`$TwitterCardURL: <$TwitterCardURL>"
                             }
                             else 
                             {
@@ -646,37 +651,37 @@ date       title                                                                
                         }  
                         "twitter"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $TwitterCardFound = $True
                         }
                         "card"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $Card = $PropertyValue 
                         }
                         "site"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $site = $PropertyValue 
                         }
                         "creator"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $creator = $PropertyValue 
                         }
                         "description"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $description = $PropertyValue 
                         }
                         "image"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $image = $PropertyValue 
                         }
                         "url"
                         { 
-                            write-debug "$PropertyValue - in switch"; 
+                            write-dbg "$PropertyValue - in switch"; 
                             $url = $PropertyValue 
                         }
                         <#
@@ -689,23 +694,23 @@ date       title                                                                
                             {
                                 "tags"
                                 { 
-                                    write-debug "in `$PropertyNameFromPreviousLine switch Tags"; 
+                                    write-dbg "in `$PropertyNameFromPreviousLine switch Tags"; 
                                     $TagString = "$TagString, $PropertyValue"
                                 }
                         
                                 "categories"
                                 { 
-                                    write-debug "in `$PropertyNameFromPreviousLine switch categories `$PropertyValue: <$PropertyValue>"; 
+                                    write-dbg "in `$PropertyNameFromPreviousLine switch categories `$PropertyValue: <$PropertyValue>"; 
                                     
                                     $StartofValue = $PropertyValue.indexof('-') + 1 
                                     $PropertyValue = $PropertyValue.substring($StartOfValue, $PropertyValue.length - $StartOfValue)
                                     $CategoriesString = "$CategoriesString~$PropertyValue"
-                                    write-debug "in `$PropertyNameFromPreviousLine switch: `$CategoriesString: <$CategoriesString>"; 
+                                    write-dbg "in `$PropertyNameFromPreviousLine switch: `$CategoriesString: <$CategoriesString>"; 
                                 }
                         
                                 "aliases"
                                 { 
-                                    write-debug "in `$PropertyNameFromPreviousLine switch Aliases"; 
+                                    write-dbg "in `$PropertyNameFromPreviousLine switch Aliases"; 
                                     $aliasesString = "$AliasesString, $PropertyValue"
                                 }
                                 "default"
@@ -735,7 +740,7 @@ date       title                                                                
                     <#
                         The front matter is over, so the rest is body
                     #>
-                    write-debug "Adding to body <$Line>"
+                    write-dbg "Adding to body <$Line>"
                     $CarriageReturn = [char]13
                     $Body = @"
 $Body$Line$CarriageReturn
@@ -751,7 +756,7 @@ $Body$Line$CarriageReturn
         $AliasesArray = get-HugoValueArrayFromString -MultipleValueString $AliasesString ','
         $CategoriesArray = get-HugoValueArrayFromString -MultipleValueString $CategoriesString '~'
 
-        write-debug @"
+        write-dbg @"
         Returning...
         [PSCustomObject]@{
             title = $title        
@@ -768,12 +773,12 @@ $Body$Line$CarriageReturn
             url = $url
             unknownproperty = $unknownproperty
             body = $body
-            card = $card
-            site = $site
-            creator = $creator
+            TwitterCard = $card
+            TwitterSite = $site
+            TwitterCreator = $creator
             TwitterTitle = $TwitterCardTitle
-            image = $image
-            url = $Url
+            TwitterImage = $image
+            TwitterUrl = $Url
             TwitterDescription = $description
         }
 "@
@@ -792,7 +797,15 @@ $Body$Line$CarriageReturn
             markup = $markup
             url = $url
             unknownproperty = $unknownproperty
+            TwitterCard = $card
+            TwitterSite = $site
+            TwitterCreator = $creator
+            TwitterTitle = $TwitterCardTitle
+            TwitterImage = $image
+            TwitterUrl = $Url
+            TwitterDescription = $description
             body = $body
+
         }
             
     }
@@ -839,7 +852,7 @@ function get-HugoNameAndFirstLineValue {
   $PropertyValue = $PropertyValue.trimstart('"') 
   $PropertyValue = $PropertyValue.trimend('"') 
 
-  write-debug "Returning PropertyName <$PropertyName> PropertyValue <$PropertyValue>"
+  write-dbg "Returning PropertyName <$PropertyName> PropertyValue <$PropertyValue>"
 
   [PSCustomObject]@{ 
     PropertyName = $PropertyName
@@ -868,25 +881,25 @@ function get-HugoValueArrayFromString {
   
   write-startfunction
 
-  write-debug "`$MultipleValueString: <$MultipleValueString>"
+  write-dbg "`$MultipleValueString: <$MultipleValueString>"
   $MultipleValueString = $MultipleValueString.trimstart('[')
   $MultipleValueString = $MultipleValueString.trimend(']')
   $MultipleValueString = $MultipleValueString.trim()
   $ValueArray = $MultipleValueString.split($Delimiter)
                         
   
-  write-debug "`$MultipleValueString: <$MultipleValueString>"
+  write-dbg "`$MultipleValueString: <$MultipleValueString>"
 
 
   $CleanedUpMultipleValueString = @{}                     
   $Values = foreach ($Value in $ValueArray)
   {
-    write-debug "1: `$Value: <$Value>"
+    write-dbg "1: `$Value: <$Value>"
     $Value = $Value.trim()
-    write-debug "2: `$Value: <$Value>"
+    write-dbg "2: `$Value: <$Value>"
     $Value = $Value.trim('"')
     $Value = $Value.trim()
-    write-debug "3: `$Value: <$Value>"
+    write-dbg "3: `$Value: <$Value>"
     if ($Value -ne "")
     {
       $Value 
@@ -953,10 +966,10 @@ body            :
         backup-filetooldfolder $HugoMarkdownFile
     }
 
-    write-debug "`$Tags: <$Tags>"
+    write-dbg "`$Tags: <$Tags>"
     $TagsString = foreach ($Element in $Tags)
     {
-       write-debug "`$Element: <$Element>"
+       write-dbg "`$Element: <$Element>"
        @"
 
  - "$Element"
@@ -1026,14 +1039,14 @@ backup-FileToOldFolder g:\my_scripts\x.txt
 
   if ($OldFolder)
   {
-    write-debug "`$Oldfolder specified"
+    write-dbg "`$Oldfolder specified"
   }
   else
   {
     $OldFolder = $(get-childitem $FsFile).directory
     $OldFolder = join-path -path $OldFolder -childpath "old"
   }
-  write-debug "Old folder is $OldFolder"
+  write-dbg "Old folder is $OldFolder"
 
   # If 'old' folder doesn't exist, create it
   $OldFolderExists = test-path $OldFolder
@@ -1047,11 +1060,11 @@ backup-FileToOldFolder g:\my_scripts\x.txt
 
   # get the filename without the folder
   $FileName = $(get-childitem $File).name
-  write-debug "FileName is $FileName"
+  write-dbg "FileName is $FileName"
 
   # copy the existing file to the 'old' directory
   $OldFile = join-path -Path $OldFolder -ChildPath $($FileName + '_' + $DateSuffix)
-  write-debug "OldFile is $OldFile"
+  write-dbg "OldFile is $OldFile"
   copy $File $OldFile
 
 }
@@ -1097,7 +1110,7 @@ function new-HugoParentPage {
         [string]$Title = $h.title
         [string]$Weight = $h.Weight
         $HyperLink = "<a href=`"$url`">$title</a>"
-        write-debug "`$Hyperlink: <$Hyperlink>"
+        write-dbg "`$Hyperlink: <$Hyperlink>"
         $BodyText = @"
 $BodyText
 $HyperLink
@@ -1154,7 +1167,7 @@ function get-PostsWithImages
     {
         $Images = @()
         
-        write-debug "Processing post `$P: <$P>"
+        write-dbg "Processing post `$P: <$P>"
         $MarkdownStyleImageLines = select-string "\!\[" $P
 
         $HtmlStyleImageLines = select-string "<img" $P
@@ -1163,14 +1176,14 @@ function get-PostsWithImages
         {
             $Line = $L.Line
 
-            write-debug "MD Line: $Line"
+            write-dbg "MD Line: $Line"
             $Images += get-imagesFromMarkdownStyleImageLines -line $Line
         }   
         foreach ($L in $HtmlStyleImageLines)
         {
             $Line = $L.Line
 
-            write-debug "Html Line: $Line"
+            write-dbg "Html Line: $Line"
             $Images += get-imagesFromHtmlStyleImageLines -line $Line
         }   
 
@@ -1187,7 +1200,7 @@ function get-PostsWithImages
     write-endfunction
 }
 
-function write-debugobject {
+function write-dbgobject {
     [CmdletBinding()]
     param (
         $Object
@@ -1219,18 +1232,18 @@ function get-imagesFromMarkdownStyleImageLines
         $Line
     )
     write-startfunction
-    write-debug "Line: $Line"
+    write-dbg "Line: $Line"
     
     # Format in markdown is ![alt text](/images/pic.jpg)
     
     $Line = $Line.replace("`)", "`(")
-    write-debug "Line (bracket swapped): $Line"
+    write-dbg "Line (bracket swapped): $Line"
     
     $SplitLine = $Line.Split("(")
-    write-debug "SplitLine: $SplitLine"
+    write-dbg "SplitLine: $SplitLine"
     
     $NumberofElements = $SplitLine.Length
-    write-debug "`$NumberofElements: <$NumberofElements>"
+    write-dbg "`$NumberofElements: <$NumberofElements>"
 
     $Images = @()
     for ($i=-1; $i -lt $NumberofElements; $i = $i +2)
@@ -1238,12 +1251,12 @@ function get-imagesFromMarkdownStyleImageLines
         $Element = $SplitLine[$i]
                 
         $Element = $Element.trim()
-        write-debug "`$NumberofElements: <$NumberofElements> `$i: <$i> `$Element: <$Element>"
+        write-dbg "`$NumberofElements: <$NumberofElements> `$i: <$i> `$Element: <$Element>"
 
         if (test-ElementIsImage -Element $Element)
         {
             $Images += $Element
-            write-debug "Returning `$Element: <$Element>"
+            write-dbg "Returning `$Element: <$Element>"
         }
     }
     return $Images
@@ -1288,31 +1301,31 @@ function get-imagesFromHtmlStyleImageLines
     )
 
     write-startfunction
-    write-debug "Line: $Line"
+    write-dbg "Line: $Line"
     
     # Format in html is <a href="/images/Titanic-sinks.jpg"><img src="/images/Titanic-sinks.jpg" alt="Titanic"/></a>
     $Line = $Line.replace(" ", "")
-    write-debug "Line: $Line"
+    write-dbg "Line: $Line"
     
     
     $SplitLine = $Line -Split "imgsrc=`""
-    write-debug "SplitLine: $SplitLine"
+    write-dbg "SplitLine: $SplitLine"
     
     $NumberofElements = $SplitLine.Length
-    write-debug "`$NumberofElements: <$NumberofElements>"
+    write-dbg "`$NumberofElements: <$NumberofElements>"
 
     $Images = @()
     for ($i=0; $i -lt $NumberofElements; $i = $i +2)
     {
         $Element = $SplitLine[$i -1]
-        write-debug "`$NumberofElements: <$NumberofElements> `$i: <$i> `$Element: <$Element>"
+        write-dbg "`$NumberofElements: <$NumberofElements> `$i: <$i> `$Element: <$Element>"
         
         $TrimmedElement = $Element.split("`"")[0]
         
         if (test-ElementIsImage -Element $TrimmedElement)
         {
             $Images += $TrimmedElement
-            write-debug "Added `$TrimmedElement: <$TrimmedElement>"
+            write-dbg "Added `$TrimmedElement: <$TrimmedElement>"
         }
     }
     
@@ -1354,7 +1367,7 @@ function test-ElementIsImage
     $NumberOfSplits = $SplitElement.length
     
     $PossibleFileType = $( $SplitElement[$NumberOfSplits - 1])
-    write-debug "`$PossibleFileType: <$PossibleFileType>"
+    write-dbg "`$PossibleFileType: <$PossibleFileType>"
     
     if ($ImageFileTypes -icontains $PossibleFileType)
     {
@@ -1407,7 +1420,7 @@ function get-ImageDetails
         write-host "Testing $(join-path $ImagePath $image)>"
         $ImageExists = test-path $(join-path $ImagePath $image)
         
-        write-debug @"
+        write-dbg @"
         [PSCustomObject]@{ Image=$Image  
             ImageExists=$ImageExists
             Name = $name
@@ -1497,13 +1510,13 @@ function Get-MarkdownLinkForImageFile
         $SubFolder = "images",
         [switch]$Last = $False
     )
-    write-debug "`$File: <$File>"    
+    write-dbg "`$File: <$File>"    
     $FilesToProcess = $(get-childitem $File)
 
     if ($Last -eq $True)
     {
         $FilesToProcess = $FilesToProcess | sort-object -Property LastWriteTime | select -Last 1
-        write-debug "In last"
+        write-dbg "In last"
     }
 
     if ($SortOrder -eq "LastWriteTime")
@@ -1514,22 +1527,22 @@ function Get-MarkdownLinkForImageFile
     foreach ($F in $FilesToProcess)
     {
         $File = $F.FullName
-        write-debug "`$File: <$File>" 
+        write-dbg "`$File: <$File>" 
 
         $File = [System.IO.Path]::GetFileName($File)
-        write-debug "`$File: <$File>" 
+        write-dbg "`$File: <$File>" 
 
         $File = $File.replace("\", '/')
-        write-debug "`$File: <$File>" 
+        write-dbg "`$File: <$File>" 
         
         $Description = $File.replace('/', '')
-        write-debug "`$Description: <$Description>"
+        write-dbg "`$Description: <$Description>"
 
         $Description = $Description.replace('.jpg','')
-        write-debug "`$Description: <$Description>"
+        write-dbg "`$Description: <$Description>"
         
         $Description = $Description.replace('/', '')
-        write-debug "`$Description: <$Description>"
+        write-dbg "`$Description: <$Description>"
         
         
         $Description = $Description.replace('/', '')
@@ -1538,7 +1551,7 @@ function Get-MarkdownLinkForImageFile
         $Description = $Description.replace('0x', '')
         $Description = $Description.replace('images', '')
         $Description = $Description -replace "[0-9][0-9]*x[0-9][0-9]*",""
-        write-debug "`$Description: <$Description>"
+        write-dbg "`$Description: <$Description>"
         
         
 
@@ -1574,15 +1587,15 @@ function write-startfunction {
       [string]$Arguments = $CallingFunction.Arguments 
       # [string]$FunctionName = $CallingFunction.FunctionName
        
-      write-debug "$CallDate Start: $Command"
+      write-debug "$Command`: starting at: $CallDate"
       $Arguments = $Arguments.trimstart('{')
       $Arguments = $Arguments.trimend('}')
       $SplitArguments = $Arguments.split(',')
       foreach ($A in $SplitArguments)
       {
-        write-debug "- $($A.trimstart())"
+        write-debug "$Command`: Parameter: $($A.trimstart())"
       }
-      write-debug "- $Location"
+      write-debug "$Command: $Location"
       return
     }
     
@@ -1596,12 +1609,44 @@ function write-startfunction {
       [CmdletBinding()]
       Param(  ) 
     
-      $CallDate = get-date -format 'hh:mm:ss.ffff' 
-      $CallingFunction = Get-PSCallStack | Select-Object -first 2 | select-object -last 1
-    
-      [string]$Command = $CallingFunction.Command        
-      [string]$Location = $CallingFunction.Location 
-       
-      write-debug "$CallDate Finish: $Location $Command"
+      if ($DebugPreference -ne 'SilentlyContinue')
+      {
+        $CallDate = get-date -format 'hh:mm:ss.ffff' 
+        $CallingFunction = Get-PSCallStack | Select-Object -first 2 | select-object -last 1
+        
+        [string]$Command = $CallingFunction.Command        
+        [string]$Location = $CallingFunction.Location 
+        
+        write-debug "$Command`: Finish: $CallDate $Location"
+      }
       return
     }
+
+    function write-dbg { 
+        <#
+        .SYNOPSIS
+          write-dbg with function and time stamp
+        .DESCRIPTION
+          Gets parameters back from Get-PSCallStack
+        .EXAMPLE
+          write-startfunction $MyInvocation
+        #>
+          [CmdletBinding()]
+          Param( $x ) 
+        
+          if ($DebugPreference -ne 'SilentlyContinue')
+          {
+                 
+            $CallingFunction = Get-PSCallStack | Select-Object -first 2 | select-object -last 1
+            
+            [string]$Command = $CallingFunction.Command        
+            
+            # $CallDate = get-date -format 'hh:mm:ss.ffff' 
+            
+            # write-dbg "$CallDate $Command`: $x"
+            
+            write-debug "$Command`: $x"
+          }
+          return
+    }
+    

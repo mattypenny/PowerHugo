@@ -142,36 +142,37 @@ Describe "get-HugoContent for a single file" {
 Describe -Tag Twitterx "get-HugoContent for a single file which already has Twitter card data" {
     
     $HugoContent = get-HugoContent -f $TestData\9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born.md
+    $FileDescription = "Warton"
 
-    It "returns title" {
+    It "returns title for a file which already has Twitter card data ($FileDescription)" {
         $title = $HugoContent.title
-        $title | Should Be '9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born'
+        $title | Should Be '9th January 1728 - Thomas Warton, \'Written at Stonehenge\' writer was born'
     }
 
-    It "returns description" {
+    It "returns description for a file which already has Twitter card data ($FileDescription)" {
         $description = $HugoContent.description
         $description | Should Be ''
     }
 
 
-    It "returns lastmod" {
+    It "returns lastmod for a file which already has Twitter card data ($FileDescription)" {
         $lastmod = $HugoContent.lastmod
         $lastmod | Should Be '2016-10-04'
     }
 
-    It "returns date" {
+    It "returns date for a file which already has Twitter card data ($FileDescription)" {
         $date = $HugoContent.date
         $date | Should Be '2013-11-12'
     }
 
-    It "returns tags" {
+    It "returns tags for a file which already has Twitter card data ($FileDescription)" {
         $tags = $HugoContent.tags
         $tags[0] | Should be ""
 
         
     }
 
-    It "returns categories" {
+    It "returns categories for a file which already has Twitter card data ($FileDescription)" {
         $categories = $HugoContent.categories
         $ExpectedCategories = @("on-this-day", "dummy")
         $Comparison = Compare-Object $categories $ExpectedCategories
@@ -179,7 +180,7 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
         $Comparison.SideIndicator | Should Be "=>"
     }
 
-    It "returns aliases" {
+    It "returns aliases for a file which already has Twitter card data ($FileDescription)" {
         $Content = $HugoContent.aliases
         $ExpectedContent = @("/on-this-day/january/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born", "/about-Pepys-and-Salisbury", "dummy")
         $Comparison = Compare-Object $Content $ExpectedContent
@@ -187,56 +188,71 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
         $Comparison.SideIndicator | Should Be "=>" 
     }
 
-    It "returns draft" {
+    It "returns draft for a file which already has Twitter card data ($FileDescription)" {
         $draft = $HugoContent.draft
         $draft | Should Be 'No'
     }
 
-    It "returns publishdate" {
+    It "returns publishdate for a file which already has Twitter card data ($FileDescription)" {
         $publishdate = $HugoContent.publishdate
         $publishdate | Should Be '2013-11-12'
     }
 
-    It "returns weighting" {
+    It "returns weighting for a file which already has Twitter card data ($FileDescription)" {
         $Weight = $HugoContent.Weight
         $Weight | Should Be '109'
     }
 
-    It "returns markup" {
+    It "returns markup for a file which already has Twitter card data ($FileDescription)" {
         $markup = $HugoContent.markup
         $markup | Should Be 'Md'
     }
 
-    It "returns url" {
+    It "returns url for a file which already has Twitter card data ($FileDescription)" {
         $url = $HugoContent.url
-        $url | Should Be '/on-this-day/june/10th-june-1668-samuel-pepys-visits-salisbury'
+        $url | Should Be ''
     }
 
-    It "returns twitter card card" {
-
+    It "returns twitter card card for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterCard = $HugoContent.TwitterCard
+        $TwitterCard | Should Be 'summary_large_image'
     }
 
-    It "returns twitter card site" {
-        
+    It "returns twitter card site for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterSite = $HugoContent.TwitterSite
+        $TwitterSite | Should Be '@salisbury_matt'
+    
     }
 
-    It "returns twitter card creator" {
-        
-    }
+    It "returns twitter card creator for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterCreator = $HugoContent.TwitterCreator
+        $TwitterCreator | Should Be '@salisbury_matt'
+    }   
+    
 
-    It "returns twitter card title" {
-        
-    }
+    It "returns twitter card title for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterTitle = $HugoContent.TwitterTitle
+        $TwitterTitle | Should Be '9th January 1728 - Thomas Warton, Written at Stonehenge writer was born'
+    }   
+    
 
-    It "returns twitter card description" {
-        
-    }
+    It "returns twitter card description for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterDescription = $HugoContent.TwitterDescription
+        $TwitterDescription | Should Be 'On this day, 9th January in 1728,  poet laureate Thomas Warton was born in Basingstoke. He wrote Written at Stonehenge.'
+    }   
+    
 
-    It "returns twitter card image" {
-        
-    }
-    It "returns twitter card url" {
-        
+    It "returns twitter card image for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterImage = $HugoContent.TwitterImage
+        $TwitterImage | Should Be 'https://salisburyandstonehenge.net/images/Thomaswarton.jpg'
+    }   
+    
+
+    It "returns twitter card url for a file which already has Twitter card data ($FileDescription)" {
+        $TwitterCard = $HugoContent.TwitterUrl
+
+        $TwitterCard | Should Be 'http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born'
+       
     }
 
 
@@ -589,7 +605,7 @@ Describe "get-imagesFromMarkdownStyleImageLines" {
     }
 }
 
-Describe -Tag Twitterx "Get-TwitterCardText" {
+Describe -Tag Twitterx "Get-ExtractedTwitterCardText" {
     $SplatParams = @{
         Card = "summary_large_image"
         Site = "@salisbury_matt"
@@ -602,14 +618,24 @@ Describe -Tag Twitterx "Get-TwitterCardText" {
     }
 
     $HugoMarkdownFile = "./pesterdata/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born.md"
-    [string]$ExpectedTwitterCardText = "???"
+    [string]$ExpectedExtractedTwitterCardText = @"
+
+twitter:
+    card: summary_large_image
+    site: @salisbury_matt
+    creator: @salisbury_matt
+    title: 9th January 1728 - Thomas Warton, Written at Stonehenge writer was born
+    description: On this day in 1728 poet laureate Thomas Warton was born in Basingstoke. He wrote 'Written at Stonehenge'. I wrote about 'Written at Stonehenge' here:  * 'Written at Stonehenge' by Thomas Warton.
+    image: http://salisburyandstonehenge.net/images/Thomaswarton.jpg
+    url: http://salisburyandstonehenge.nethttp://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born
+"@
     
     It "returns the correct text for a single file ($HugoMarkdownFile)" {
 
 
-        $TwitterCardText = Get-TwitterCardText @SplatParams -HugoMarkdownFile $HugoMarkdownFile
+        $ExtractedTwitterCardText = Get-ExtractedTwitterCardText @SplatParams -HugoMarkdownFile $HugoMarkdownFile
 
-        $TwitterCardText | Should Be $ExpectedTwitterCardText
+        $ExtractedTwitterCardText | Should Be $ExpectedExtractedTwitterCardText
 
     }
 
