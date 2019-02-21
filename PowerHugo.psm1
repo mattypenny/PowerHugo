@@ -1595,7 +1595,7 @@ function write-startfunction {
       {
         write-debug "$Command`: Parameter: $($A.trimstart())"
       }
-      write-debug "$Command: $Location"
+      write-debug "$Command`: $Location"
       return
     }
     
