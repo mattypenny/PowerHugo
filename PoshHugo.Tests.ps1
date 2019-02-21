@@ -9,6 +9,28 @@ $TEMP = join-path -path "$ENV:HOME" -childPath $TMPNAME
 
 # . "$here\$sut"
 
+function write-TestNameToDebug {
+    [CmdletBinding()]
+    $PSCallStack = Get-PSCallStack | ? Command -eq 'It' | select -expandproperty Arguments
+
+    [string]$Name = $PSCallStack.name
+    
+    $TestName = $Name.split(',')[1]
+
+    write-debug "#"
+    write-debug "#"
+    write-debug "# It $Testname"
+    write-debug "#"
+    write-debug "#"
+    
+    
+    write-host "#"
+    write-host "#"
+    write-host "# It $Testname"
+    write-host "#"
+    write-host "#"
+   
+}
 
 $HugoContentFolder = join-path "." "PesterData"
 
@@ -209,6 +231,18 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
     }
 
     It "returns url for a file which already has Twitter card data ($FileDescription)" {
+        
+        write-TestNameToDebug
+        Get-PSCallStack > /tmp/v.txt
+        
+        Get-PSCallStack | ? Command -eq 'Describe' | select -expandproperty Arguments  >> /tmp/v.txt
+
+        Get-PSCallStack | ? Command -eq 'Describe' | select -expandproperty Arguments | gm  >> /tmp/v.txt
+
+        Get-PSCallStack | ? Command -eq 'Describe' | select -expandproperty Arguments | select name >> /tmp/v.txt
+        
+        Get-PSCallStack | ? Command -eq 'It' | select -expandproperty Arguments | select name >> /tmp/v.txt
+        
         $url = $HugoContent.url
         $url | Should Be ''
     }
