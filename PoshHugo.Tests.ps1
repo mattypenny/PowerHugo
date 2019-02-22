@@ -647,7 +647,7 @@ Describe -Tag Twitterx "Get-ExtractedTwitterCardText" {
         DescriptionMaxLength = 240
         ImageUrlRoot = 'http://salisburyandstonehenge.net'
         DefaultImage = "http://salisburyandstonehenge.net/images/View%20of%20the%20spire%20from%20Salisbury%20Cathedral's%20cafe.JPG"
-        UrlRoot = 'http://salisburyandstonehenge.net'
+        UrlRoot = 'http://salisburyandstonehenge.net/on-this-day'
         ImagePath = '/home/matt/salisburyandstonehenge.net/static/images'
     }
 
@@ -661,7 +661,7 @@ twitter:
     title: 9th January 1728 - Thomas Warton, Written at Stonehenge writer was born
     description: On this day in 1728 poet laureate Thomas Warton was born in Basingstoke. He wrote 'Written at Stonehenge'. I wrote about 'Written at Stonehenge' here:  * 'Written at Stonehenge' by Thomas Warton.
     image: http://salisburyandstonehenge.net/images/Thomaswarton.jpg
-    url: http://salisburyandstonehenge.nethttp://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born
+    url: http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born
 "@
     
     It "returns the correct text for a single file ($HugoMarkdownFile)" {
