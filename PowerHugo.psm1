@@ -679,11 +679,6 @@ date       title                                                                
                             write-dbg "$PropertyValue - in switch"; 
                             $image = $PropertyValue 
                         }
-                        "url"
-                        { 
-                            write-dbg "$PropertyValue - in switch"; 
-                            $url = $PropertyValue 
-                        }
                         <#
                             if the Property name is null, either it's an invalid line
                             or it's multiline
