@@ -637,12 +637,14 @@ date       title                                                                
                             $markup = $PropertyValue 
                         }
                         "url"
-                        { 
-                            write-dbg "$PropertyValue - in switch"; 
-                            if ($TwitterCardFound)
+                        {
+                            write-dbg "Url processing `$TwitterCardFound: <$TwitterCardFound> $PropertyValue - in switch`$PropertyName: <$PropertyName> `$PropertyValue: <$PropertyValue>"
+                             if ($TwitterCardFound)
                             {
+
                                 $TwitterCardURL = $PropertyValue
                                 write-dbg "`$TwitterCardURL: <$TwitterCardURL>"
+        
                             }
                             else 
                             {
@@ -773,7 +775,7 @@ $Body$Line$CarriageReturn
             TwitterCreator = $creator
             TwitterTitle = $TwitterCardTitle
             TwitterImage = $image
-            TwitterUrl = $Url
+            TwitterCardUrl = $TwitterCardUrl
             TwitterDescription = $description
         }
 "@
