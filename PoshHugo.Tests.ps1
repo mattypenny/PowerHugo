@@ -204,7 +204,7 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
 
     It "returns aliases for a file which already has Twitter card data ($FileDescription)" {
         $Content = $HugoContent.aliases
-        $ExpectedContent = @("/on-this-day/january/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born", "/about-Pepys-and-Salisbury", "dummy")
+        $ExpectedContent = @("/on-this-day/january/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born", "dummy")
         $Comparison = Compare-Object $Content $ExpectedContent
         $Comparison.InputObject | Should Be "dummy"
         $Comparison.SideIndicator | Should Be "=>" 
@@ -212,7 +212,7 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
 
     It "returns draft for a file which already has Twitter card data ($FileDescription)" {
         $draft = $HugoContent.draft
-        $draft | Should Be 'No'
+        $draft | Should Be ''
     }
 
     It "returns publishdate for a file which already has Twitter card data ($FileDescription)" {
@@ -283,9 +283,9 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
     
 
     It "returns twitter card url for a file which already has Twitter card data ($FileDescription)" {
-        $TwitterCard = $HugoContent.TwitterUrl
+        $TwitterCardUrl = $HugoContent.TwitterUrl
 
-        $TwitterCard | Should Be 'http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born'
+        $TwitterCardUrl | Should Be 'http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born'
        
     }
 
