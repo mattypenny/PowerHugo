@@ -799,7 +799,7 @@ $Body$Line$CarriageReturn
             TwitterCreator = $creator
             TwitterTitle = $TwitterCardTitle
             TwitterImage = $image
-            TwitterUrl = $Url
+            TwitterUrl = $TwitterCardUrl
             TwitterDescription = $description
             body = $body
 
