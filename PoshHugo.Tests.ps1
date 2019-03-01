@@ -168,13 +168,12 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
 
     It "returns title for a file which already has Twitter card data ($FileDescription)" {
         $title = $HugoContent.title
-        $title | Should Be '9th January 1728 - Thomas Warton, \'Written at Stonehenge\' writer was born'
+        $Expected = @"
+9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born
+"@
+        $title | Should Be $Expected
     }
 
-    It "returns description for a file which already has Twitter card data ($FileDescription)" {
-        $description = $HugoContent.description
-        $description | Should Be ''
-    }
 
 
     It "returns lastmod for a file which already has Twitter card data ($FileDescription)" {
@@ -189,7 +188,7 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
 
     It "returns tags for a file which already has Twitter card data ($FileDescription)" {
         $tags = $HugoContent.tags
-        $tags[0] | Should be ""
+        $tags.length | Should be 0
 
         
     }
@@ -265,8 +264,8 @@ Describe -Tag Twitterx "get-HugoContent for a single file which already has Twit
     
 
     It "returns twitter card title for a file which already has Twitter card data ($FileDescription)" {
-        $TwitterTitle = $HugoContent.TwitterTitle
-        $TwitterTitle | Should Be '9th January 1728 - Thomas Warton, Written at Stonehenge writer was born'
+        $TwitterCardTitle = $HugoContent.TwitterCardTitle
+        $TwitterCardTitle | Should Be '9th January 1728 - Thomas Warton, Written at Stonehenge writer was born'
     }   
     
 
@@ -658,7 +657,7 @@ twitter:
     card: summary_large_image
     site: @salisbury_matt
     creator: @salisbury_matt
-    title: 9th January 1728 - Thomas Warton, Written at Stonehenge writer was born
+    title: 9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born
     description: On this day in 1728 poet laureate Thomas Warton was born in Basingstoke. He wrote 'Written at Stonehenge'. I wrote about 'Written at Stonehenge' here:  * 'Written at Stonehenge' by Thomas Warton.
     image: http://salisburyandstonehenge.net/images/Thomaswarton.jpg
     url: http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born
