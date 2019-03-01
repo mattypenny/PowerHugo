@@ -569,17 +569,20 @@ date       title                                                                
                     {
                         "title" 
                         { 
-                            write-dbg "in switch"; 
-                            $title = $PropertyValue
-                            $TitleCount = $TitleCount + 1
+                            write-dbg "x572: `$PropertyName: <$PropertyName> `$PropertyValue: <$PropertyValue> `$TitleCount: <$TitleCount>  `$TwitterCardFound: <$TwitterCardFound>"; 
                             
-                            if ($TitleCount -gt 1)
+                            if ($TitleCount -gt 0)
                             {
                                 if ($TwitterCardFound -eq $True)
                                 {
                                     
                                     $TwitterCardTitle = $PropertyValue
                                 }
+                            }
+                            else 
+                            {
+                                $title = $PropertyValue
+                                $TitleCount = $TitleCount + 1
                             }
                         }
                         "description"
@@ -773,7 +776,7 @@ $Body$Line$CarriageReturn
             TwitterCard = $card
             TwitterSite = $site
             TwitterCreator = $creator
-            TwitterTitle = $TwitterCardTitle
+            TwitterCardTitle = $TwitterCardTitle
             TwitterImage = $image
             TwitterCardUrl = $TwitterCardUrl
             TwitterDescription = $description
@@ -797,7 +800,7 @@ $Body$Line$CarriageReturn
             TwitterCard = $card
             TwitterSite = $site
             TwitterCreator = $creator
-            TwitterTitle = $TwitterCardTitle
+            TwitterCardTitle = $TwitterCardTitle
             TwitterImage = $image
             TwitterUrl = $TwitterCardUrl
             TwitterDescription = $description
