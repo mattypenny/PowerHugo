@@ -1417,7 +1417,7 @@ function get-ImageDetails
         $name = $i.Name
         $fullname = $i.Fullname
         
-        write-host "Testing $(join-path $ImagePath $image)>"
+        write-dbg "Testing  <$ImagePath> <$image>"
         $ImageExists = test-path $(join-path $ImagePath $image)
         
         write-dbg @"

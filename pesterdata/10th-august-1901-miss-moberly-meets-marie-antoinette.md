@@ -1,4 +1,4 @@
-code---
+---
 title: "10th August 1901 - Miss Moberly meets Marie Antoinette"
 description: ""
 lastmod: "2016-07-07"
@@ -13,7 +13,7 @@ weight: 810
 markup: "md"
 url: /on-this-day/august/10th-august-1901-miss-moberly-meets-marie-antoinette
 ---
-<a href="/images/Louise_Elisabeth_Vigée-Lebrun_-_Marie-Antoinette_dit_«_à_la_Rose_»_-_Google_Art_Project.jpg"><img src="/images/Louise_Elisabeth_Vigée-Lebrun_-_Marie-Antoinette_dit_«_à_la_Rose_»_-_Google_Art_Project-247x300.jpg" alt="Louise_Elisabeth_Vigée-Lebrun_-_Marie-Antoinette_dit_«_à_la_Rose_»_-_Google_Art_Project" width="247" height="300" class="alignright size-medium wp-image-9201" /></a>On 10 Aug 1901, Annie Moberly, daughter of the George Moberly, Bishop of Salisbury saw Marie Antoinette in the gardens at Versailles.
+<a href="/images/Louise_Elisabeth_Vigée-Lebrun_-_Marie-Antoinette_dit_«_à_la_Rose_»_-_Google_Art_Project.jpg"><img src="/images/Marie.jpg" alt="Louise_Elisabeth_Vigée-Lebrun_-_Marie-Antoinette_dit_«_à_la_Rose_»_-_Google_Art_Project" width="247" height="300" class="alignright size-medium wp-image-9201" /></a>On 10 Aug 1901, Annie Moberly, daughter of the George Moberly, Bishop of Salisbury saw Marie Antoinette in the gardens at Versailles.
 
 The reason this is notable is that Marie Antoinette had been dead for just over 100 years<ref>Marie Antoinette was executed during the French Revolution. She was guillotined in the Place de la Concorde on 16 Oct 1793</ref>.
 

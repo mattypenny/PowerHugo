@@ -353,7 +353,7 @@ Describe "get-HugoValueArrayFromString" {
 
 }
 
-Describe "get-HugoContent for multiple files" {
+Describe -Tag notworking "get-HugoContent for multiple files" {
     
     
     
@@ -362,12 +362,13 @@ Describe "get-HugoContent for multiple files" {
     It "returns title" {
         $HugoTitles = get-HugoContent -f $TestData\*.md | select title
         
-        $ExpectedTitles = @("10th August 1901 - Miss Moberly meets Marie Antoinette",               
-                            "10th June 1668 - Samuel Pepys visits Salisbury",                      
-                            "15th June 1786 - Matcham meets 'the Dead Drummer', possibly",          
-                            "1st May 472 - the 'Night of the Long Knives' at Amesbury",             
-                            "3rd June 1977 - the Ramones visit Stonehenge. Johnny stays on the bus"
-                             )
+        $ExpectedTitles = @()
+        $ExpectedTitles += [PSCustomObject]@{ Title = "10th August 1901 - Miss Moberly meets Marie Antoinette"}
+        $ExpectedTitles += [PSCustomObject]@{ Title = "10th June 1668 - Samuel Pepys visits Salisbury"}                     
+        $ExpectedTitles += [PSCustomObject]@{ Title =  "15th June 1786 - Matcham meets 'the Dead Drummer', possibly"}          
+        $ExpectedTitles += [PSCustomObject]@{ Title =  "1st May 472 - the 'Night of the Long Knives' at Amesbury"}          
+        $ExpectedTitles += [PSCustomObject]@{ Title = "3rd June 1977 - the Ramones visit Stonehenge. Johnny stays on the bus"}
+                            
         $ExpectedTitles
         $Comparison = Compare-Object $HugoTitles.title $ExpectedTitles
     
@@ -407,6 +408,9 @@ Describe "get-HugoContent for a single file - body processing" {
 }
 
 Describe "set-HugoContent backs up an existing file" {
+ 
+    write-output "Hello" > /tmp/markdown_file.md
+
     It "creates a backup copy of the existing file" {
  
         $Now = get-date -uformat "%Y%m%d%H%M"
@@ -671,6 +675,7 @@ twitter:
         $ExtractedTwitterCardText | Should Be $ExpectedExtractedTwitterCardText
 
     }
+    
 
 }
 Describe -Tag Twitter,Dickens "Get-TwitterCardMetaData for the Dickens post" {
@@ -841,9 +846,13 @@ Describe -Tag Image -Name 'get-ImageDetails' {
         $($SingleImage | Measure-Object).count | Should Be 1
     }
 
+    $SingleImage = get-ImageDetails -PostPath ./pesterdata/10th-august-1901-miss-moberly-meets-marie-antoinette.md -ImagePath ./pesterdata
+
     It 'returns False for ImageExists if it doesnt exist' {
 
     }
+
+    $SingleImage = get-ImageDetails -PostPath ./pesterdata/10th-august-1901-miss-moberly-meets-marie-antoinette.md -ImagePath ./pesterdata
 
     It 'returns true for ImageExists if it does exist' {
         $ImageExists = $SingleImage.ImageExists
