@@ -368,11 +368,17 @@ Describe -Tag notworking "get-HugoContent for multiple files" {
         $ExpectedTitles += [PSCustomObject]@{ Title =  "15th June 1786 - Matcham meets 'the Dead Drummer', possibly"}          
         $ExpectedTitles += [PSCustomObject]@{ Title =  "1st May 472 - the 'Night of the Long Knives' at Amesbury"}          
         $ExpectedTitles += [PSCustomObject]@{ Title = "3rd June 1977 - the Ramones visit Stonehenge. Johnny stays on the bus"}
+        $ExpectedTitles += [PSCustomObject]@{ Title = "7th February 1812 - birth of Charles Dickens"}
+        $ExpectedTitles += [PSCustomObject]@{ Title = "9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born"}
+        
                             
         $ExpectedTitles
-        $Comparison = Compare-Object $HugoTitles.title $ExpectedTitles
+        $Comparison = Compare-Object $HugoTitles $ExpectedTitles
     
-        $Comparison.InputObject | Should Be "Elvis Presley visits Salisbury (this is a test)"
+        [string]$DummyTitle = $Comparison.InputObject.Title 
+        
+        $DummyTitle | Should Be "Elvis Presley visits Salisbury (this is a test)"
+        
         $Comparison.SideIndicator | Should Be "<=" 
     
     }

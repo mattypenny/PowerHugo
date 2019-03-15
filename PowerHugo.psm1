@@ -21,7 +21,7 @@ twitter:
 function Get-ExtractedTwitterCardText {
     [CmdletBinding()]
     param (
-        $HugoMarkdownFile,
+        [string]$HugoMarkdownFile,
         [string]$Card = "summary_large_image",
         [string]$Site = $DefaultTwitterSite,
         [string]$Creator = $DefaultTwitterCreator,
@@ -94,7 +94,7 @@ twitter:
 
     write-endfunction
 
-    write-dbg "`$ExtractedTwitterCardText: <$ExtractedTwitterCardText>"
+    # write-dbg "`$ExtractedTwitterCardText: <$ExtractedTwitterCardText>"
     $ExtractedTwitterCardText
 }
 
@@ -1417,7 +1417,7 @@ function get-ImageDetails
         $name = $i.Name
         $fullname = $i.Fullname
         
-        write-dbg "Testing  <$ImagePath> <$image>"
+        write-dbg "Testing `$ImageExists  <$ImagePath> <$image>"
         $ImageExists = test-path $(join-path $ImagePath $image)
         
         write-dbg @"
