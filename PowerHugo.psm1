@@ -360,7 +360,7 @@ function Get-ChildItemByWeight
     
     $MatchingFiles = foreach ($F in $(dir $Path))
     {
-        $Filename = $F.name
+        $Filename = $F.fullname
 	write-dbg "`$Filename: <$Filename>"
         $WeightMatch = select-string "Weight: " $Filename
 
