@@ -81,13 +81,13 @@ function Get-ExtractedTwitterCardText {
         $ExtractedTwitterCardText += @"
 $ExtractedTwitterCardText
 twitter:
-    card: $Card
-    site: $Site
-    creator: $Creator
-    title: $Title
-    description: $Description
-    image: $ImageURL
-    url: $URL
+    card: "$Card"
+    site: "$Site"
+    creator: "$Creator"
+    title: "$Title"
+    description: "$Description"
+    image: "$ImageURL"
+    url: "$URL"
 "@
 
     }
@@ -1035,15 +1035,13 @@ backup-FileToOldFolder g:\my_scripts\x.txt
 
   write-startfunction
 
-  $FsFile="Filesystem::$File"
-
   if ($OldFolder)
   {
     write-dbg "`$Oldfolder specified"
   }
   else
   {
-    $OldFolder = $(get-childitem $FsFile).directory
+    $OldFolder = $(get-childitem $File).directory
     $OldFolder = join-path -path $OldFolder -childpath "old"
   }
   write-dbg "Old folder is $OldFolder"
