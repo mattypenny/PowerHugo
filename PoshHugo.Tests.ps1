@@ -664,13 +664,13 @@ Describe -Tag Twitterx "Get-ExtractedTwitterCardText" {
     [string]$ExpectedExtractedTwitterCardText = @"
 
 twitter:
-    card: summary_large_image
-    site: @salisbury_matt
-    creator: @salisbury_matt
-    title: 9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born
-    description: On this day in 1728 poet laureate Thomas Warton was born in Basingstoke. He wrote 'Written at Stonehenge'. I wrote about 'Written at Stonehenge' here:  * 'Written at Stonehenge' by Thomas Warton.
-    image: http://salisburyandstonehenge.net/images/Thomaswarton.jpg
-    url: http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born
+    card: "summary_large_image"
+    site: "@salisbury_matt"
+    creator: "@salisbury_matt"
+    title: "9th January 1728 - Thomas Warton, 'Written at Stonehenge' writer was born"
+    description: "On this day in 1728 poet laureate Thomas Warton was born in Basingstoke. He wrote 'Written at Stonehenge'. I wrote about 'Written at Stonehenge' here:  * 'Written at Stonehenge' by Thomas Warton."
+    image: "http://salisburyandstonehenge.net/images/Thomaswarton.jpg"
+    url: "http://salisburyandstonehenge.net/on-this-day/9th-january-1728-thomas-warton-written-at-stonehenge-writer-was-born"
 "@
     
     It "returns the correct text for a single file ($HugoMarkdownFile)" {
