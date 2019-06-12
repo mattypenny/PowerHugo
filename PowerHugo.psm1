@@ -1,4 +1,79 @@
-﻿$DefaultImageUrlRoot = 'http://salisburyandstonehenge.net'
+﻿function New-OtdPage {
+    [CmdletBinding()]
+    param (
+        [string]$DateOfEvent,
+        [string]$Event        
+    )
+
+    [string]$DateOfEventInOtdFormat = Get-DateInOtdFormat - $DateOfEvent
+
+    [string]$TitleInOtdFormat = Get-TitleInOtdFormat -Title $Event
+
+    [string]$NameOfFile = join-path "on-this-day" -ChildPath "$DateOfEventInOtdFormat-$TitleInOtdFormat.md"
+
+
+
+}
+
+
+function New-HugoPage {
+    [CmdletBinding()]
+    param (
+        $Website,
+        $Folder,
+        $Name
+    )
+    
+    set-HugoContent -HugoMarkdownFile ???
+
+    $HugoParameters = @{
+        HugoMarkdownFile = "$HugoFile"
+        aliases = '["/on-this-day/theking"]'
+        body = 'This is a test post - sadly Elvis never got to visit Salisbury'
+        categories = 'on-this-day'
+        date = '2016-08-25'
+        description = ''
+        draft = 'No'
+        lastmod = '2016-08-25'
+        markup = 'md'
+        publishdate = '2016-08-25'
+        tags = "elvis","wiltshire","salisbury"
+        title = 'Elvis Presley visits Salisbury (this is a test)'
+        unknownproperty = 'xx'
+        url = '/on-this-day/june/elvis-visits-salisbury'
+        weight = '1'
+        nobackup = $False
+        }
+        set-HugoContent @HugoParameters
+
+}
+
+function Get-DateInOtdFormat {
+    [CmdletBinding()]
+    param (
+        $DateOfEvent
+    )
+    
+    [date]$DateTypeDate = get-date $Date
+
+    $Year = $DateTypeDate.Year
+
+    $Month = $DateTypeDate.Year
+    
+    
+}
+
+function Get-TitleInOtdFormat {
+    [CmdletBinding()]
+    param (
+        $Title
+    )
+    
+ 
+}
+
+
+$DefaultImageUrlRoot = 'http://salisburyandstonehenge.net'
 $DefaultDefaultImage = "http://salisburyandstonehenge.net/images/View%20of%20the%20spire%20from%20Salisbury%20Cathedral's%20cafe.JPG"
 $DefaultImagePath = '/home/matt/salisburyandstonehenge.net/static/images'
 $DefaultTwitterCard = "summary_large_image"
